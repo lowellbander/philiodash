@@ -9,6 +9,52 @@
 <body>
   <div id="content"></div>
   <script type="text/jsx">
+    var TrackRow = React.createClass({
+      render: function () {
+        console.log(this.props);
+        return <tr>
+          <td>
+            {this.props.track.track.name}
+          </td>
+          <td>
+            {this.props.track.track.artists.map(function (artist) {
+              return artist.name;
+            }).join(', ')}
+          </td>
+        </tr>
+      },
+    });
+    var TrackTable = React.createClass({
+      getInitialState: function () {
+        return {
+          tracks: [],
+        };
+      },
+      componentDidMount: function () {
+        var that = this; // TODO
+        $.ajax({
+          url: 'http://localhost:8080/tracks?access_token=' + this.props.token,
+          success: function (data) {
+            that.setState({tracks: data.items});
+          },
+        });
+      },
+      render: function () {
+        return <table>
+          <tr>
+            <th>
+              Track
+            </th>
+            <th>
+              Arist
+            </th>
+          </tr>
+          {this.state.tracks.map(function (track) {
+            return <TrackRow track={track} />;
+          })}
+        </table>
+      },
+    });
     var UserInfo = React.createClass({
       getInitialState: function () {
         return {
@@ -37,9 +83,8 @@
           return (
             <div>
               <p> The user is logged in </p>
-              <UserInfo
-                token={access_token}
-              />
+              <UserInfo token={access_token}/>
+              <TrackTable token={access_token}/>
             </div>
           );
         }
